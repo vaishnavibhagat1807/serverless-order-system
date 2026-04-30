@@ -1,27 +1,43 @@
-# 🚀 Serverless Order Processing System
+# Serverless Order Processing System (AWS)
 
-## 📌 Overview
-This project demonstrates a serverless architecture using AWS services to create and process orders.
+## 🚀 Overview
+This project demonstrates a serverless event-driven architecture on AWS for processing orders asynchronously.
+
+## 🏗️ Architecture
+- API Gateway (HTTP API)
+- AWS Lambda (Create Order & Process Order)
+- Amazon SQS (Queue)
+- Amazon DynamoDB (Database)
+- Amazon SNS (Email Notification)
+
+## 🔄 Workflow
+1. User sends POST request via API Gateway
+2. Create-order Lambda pushes message to SQS
+3. Process-order Lambda consumes message
+4. Data stored in DynamoDB
+5. SNS sends email notification
 
 ## 🛠️ Tech Stack
 - AWS Lambda
-- API Gateway
-- DynamoDB
-- CloudFormation
+- Amazon API Gateway
+- Amazon SQS
+- Amazon DynamoDB
+- Amazon SNS
+- Python (Boto3)
 
-## 🏗️ Architecture
-![Architecture](architecture.png)
+## 📌 Features
+- Asynchronous processing using SQS
+- Scalable serverless architecture
+- Real-time email notifications
 
-## ⚙️ Features
-- Create Order API
-- Process Order system
-- Fully serverless
+## 🧪 API Endpoint
+POST /order
 
-## 🚀 Deployment
-Using AWS CloudFormation
+Example:
+{
+  "item": "Laptop"
+}
 
-## 📸 Screenshots
-(Add later)
-
-## 🧪 Test Cases
-(Add later)
+## ✅ Output
+- Order stored in DynamoDB
+- Email notification sent via SNS
