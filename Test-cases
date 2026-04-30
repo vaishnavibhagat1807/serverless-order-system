@@ -1,1 +1,77 @@
+# API Test Cases - Order Processing System
 
+## ✅ Test Case 1: Valid Order Request
+
+**Request:**
+POST /order
+
+{
+  "item": "Laptop"
+}
+
+**Expected Result:**
+- Status: 200 OK
+- Response contains orderId
+- Order stored in DynamoDB
+- Email notification sent
+
+---
+
+## ❌ Test Case 2: Missing Item Field
+
+**Request:**
+POST /order
+
+{}
+
+**Expected Result:**
+- Status: 400 Bad Request OR handled default
+- Error message OR default item processed
+
+---
+
+## ❌ Test Case 3: Invalid Data Type
+
+**Request:**
+POST /order
+
+{
+  "item": 12345
+}
+
+**Expected Result:**
+- System should handle or convert input
+- No crash in Lambda
+
+---
+
+## 🔁 Test Case 4: Multiple Requests
+
+**Action:**
+Send multiple requests quickly
+
+**Expected Result:**
+- All requests processed
+- SQS handles load
+- No data loss
+
+---
+
+## ⚠️ Test Case 5: Empty Body
+
+**Request:**
+POST /order
+
+(no body)
+
+**Expected Result:**
+- Error handled gracefully
+- No Lambda crash
+
+---
+
+## 📩 Test Case 6: Email Notification
+
+**Expected Result:**
+- SNS sends email
+- Message: "Order <id> processed"
