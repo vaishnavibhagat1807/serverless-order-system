@@ -1,5 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
 Resources:
+
+  OrderQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: order-queue
 
   OrdersTable:
     Type: AWS::DynamoDB::Table
@@ -12,3 +19,51 @@ Resources:
         - AttributeName: orderId
           KeyType: HASH
       BillingMode: PAY_PER_REQUEST
+
+  OrderTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: order-notification
+
+  CreateOrderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: create-order
+      Runtime: python3.12
+      Handler: lambda_function.lambda_handler
+      CodeUri: create-order-lambda/
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: order-queue
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref OrderQueue
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /order
+            Method: post
+
+  ProcessOrderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: process-order
+      Runtime: python3.12
+      Handler: lambda_function.lambda_handler
+      CodeUri: process-order-lambda/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: Orders
+        - SNSPublishMessagePolicy:
+            TopicName: order-notification
+      Environment:
+        Variables:
+          TABLE_NAME: Orders
+          TOPIC_ARN: !Ref OrderTopic
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt OrderQueue.Arn
+            BatchSize: 1
